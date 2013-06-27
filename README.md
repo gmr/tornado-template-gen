@@ -1,33 +1,33 @@
 Tornado Template Generator
---------------------------
+==========================
 Generates static HTML files using Tornado templates with a subset of the
 available methods available when writing dynamic web apps. It properly handles
 includes and extended templates as well as all the base escaping methods. It
 does not include any of the request related variables.
 
 Motivation
-==========
+----------
 I use this to build static HTML files that use the template {{static_path()}} method
 for cache busting static files.
 
 Python Version
-==============
+--------------
 Python 2.6 or 2.7
 
 Installation
-============
+------------
 Install via pip:
 
     pip install tornado_template_gen
 
 Use
-===
+---
 tornado_template_gen -f path/to/template.html -s path/to/static/files [-p /url_prefix/] [-o OUTPUT FILE]
 
 If you do not specify an output file, it will spit the rendered content to STDOUT.
 
 License
-=======
+-------
 Copyright (c) 2013, MeetMe
 All rights reserved.
 
