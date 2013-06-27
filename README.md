@@ -22,9 +22,20 @@ Install via pip:
 
 Use
 ---
-tornado_template_gen -f path/to/template.html -s path/to/static/files [-p /url_prefix/] [-o OUTPUT FILE]
+tornado_template_gen -f path/to/template.html -s path/to/static/files [-p /url_prefix/] [-o OUTPUT FILE] [-k KWARG_FILE]
 
 If you do not specify an output file, it will spit the rendered content to STDOUT.
+
+Keyword Arguments File
+----------------------
+If you include a Keyword Arguments file (KWARGS) the values in the file will be
+passed into the generate method making the values available during template
+rendering. The file should be in JSON format.
+
+Example:
+
+    {"my_key": "my_value",
+     "version": "99.99.99"}
 
 License
 -------

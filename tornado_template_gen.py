@@ -7,18 +7,22 @@ static_url.
 """
 import argparse
 import hashlib
+import json
 from os import path
 import sys
 from tornado import template
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 
 class Generator(object):
 
-    def __init__(self):
-        self.static_prefix = '/static/'
-        self.static_path = None
+    def __init__(self, file_name, static_path, static_prefix='/static/',
+                 kwarg_file=None):
+        self.file_name = file_name
+        self.static_path = path.abspath(static_path)
+        self.static_prefix = static_prefix
+        self.kwarg_file = path.abspath(kwarg_file) if kwarg_file else None
 
     @property
     def static_abspath(self):
@@ -31,23 +35,27 @@ class Generator(object):
         hasher.update(content)
         return hasher.hexdigest()
 
-    def make_static_url(self, file_path, static_url_prefix='/static/'):
+    def make_static_url(self, file_path):
         try:
-            return '%s?v=%s' % (static_url_prefix + file_path,
+            return '%s?v=%s' % (self.static_prefix + file_path,
                                 self.get_file_hash(file_path)[:4])
         except IOError as error:
             sys.stderr.write('ERROR: Could not make static url (%s)\n' % error)
             sys.exit(1)
 
-    def generate(self, file_name, static_path, static_url_prefix=None):
-        if static_url_prefix:
-            self.static_prefix = static_url_prefix
-        dirs = len(file_name.split('/'))
-        file_path = '/'.join(path.abspath(file_name).split('/')[:-dirs])
-        self.static_path = path.abspath(static_path)
+    def generate(self):
+        dirs = len(self.file_name.split('/'))
+        file_path = '/'.join(path.abspath(self.file_name).split('/')[:-dirs])
         loader = template.Loader(file_path,
                                  namespace={'static_url': self.make_static_url})
-        return loader.load(file_name).generate()
+
+        if self.kwarg_file:
+            with open(self.kwarg_file) as handle:
+                kwargs = json.load(handle)
+        else:
+            kwargs = {}
+
+        return loader.load(self.file_name).generate(**kwargs)
 
 
 def parse_arguments():
@@ -67,13 +75,18 @@ def parse_arguments():
                         action='store',
                         help='Write the output to the specified file instead '
                              'of STDOUT')
+    parser.add_argument('-k', '--kwarg_file',
+                        action='store',
+                        help='KWARG file in JSON format to use when generating')
+
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
-    g = Generator()
-    output = g.generate(args.file, args.static_path, args.static_url_prefix)
+    g = Generator(args.file, args.static_path, args.static_url_prefix,
+                  args.kwarg_file)
+    output = g.generate()
     if not args.output:
         print output
     else:

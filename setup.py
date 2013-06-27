@@ -9,7 +9,7 @@ console_scripts = ['tornado-template-gen=tornado_template_gen:main']
 
 
 setup(name='tornado_template_gen',
-      version='1.0.0',
+      version='1.1.0',
       description='Generate static HTML files using the Tornado template '
                   'module',
       url='https://github.meetmecorp.com/Rejected/transformer',
